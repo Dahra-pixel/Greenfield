@@ -1,0 +1,33 @@
+<div class="basket-content">
+    {% if items %}
+        {% for item in items %}
+        <div class="basket-item-card">
+
+            <div class="basket-top">
+                <img class="basket-thumb" src="{{ item.image_path }}" alt="{{ item.product_name }}">
+                <h4>{{ item.product_name }}</h4>
+                <p class="producer">{{ item.producer_name }}</p>
+                <div class="basket-price">£{{ item.price }}</div>
+            </div>
+        
+            <div class="basket-bottom">
+                <form method="POST" action="/update_qty" class="qty-controls">
+                    <input type="hidden" name="product_id" value="{{ item.product_id }}">
+                    <button type="submit" name="action" value="minus">-</button>
+                    <span class="qty">{{ item.quantity }}</span>
+                    <button type="submit" name="action" value="plus">+</button>
+                </form>
+        
+                <form method="POST" action="/remove_item">
+                    <input type="hidden" name="product_id" value="{{ item.product_id }}">
+                    <button class="delete-btn">×</button>
+                </form>
+            </div>
+        
+        </div>
+        
+        {% endfor %}
+    {% else %}
+        <p class="empty-basket">Your basket is empty</p>
+    {% endif %}
+</div>

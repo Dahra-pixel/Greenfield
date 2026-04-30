@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="category-page">
+
+    <h2 class="page-title">{{ category|capitalize }}</h2>
+
+    <div class="product-grid">
+
+        {% for product in products %}
+            <div class="product-card">
+
+                <img src="{{ url_for('static', filename='images/' + product.name.lower().replace(' ', '-') + '.jpg') }}">
+
+                <div class="product-info">
+                    <h3>{{ product.name }}</h3>
+                    <p class="producer">By {{ product.producer }}</p>
+
+                    <div class="details">
+
+                        <!-- PRICE FORMAT: £X.XX -->
+                        <div class="detail-item">
+                            Price: £{{ "%.2f"|format(product.price) }}
+                        </div>
+
+                        <!-- QUANTITY FORMAT: auto‑cleaned -->
+                        <div class="detail-item">
+                            Quantity / Unit: {{ product.weight }} {{ product.unit }}
+                        </div>
+
+
+                        <!-- STOCK FORMAT: 1,200 -->
+                        <div class="detail-item">
+                            Available in Stock: {{ "{:,}".format(product.stock_quantity) }}
+                        </div>
+
+                    </div>
+
+                    {% if session.get("role_id") != 1 %}
+                    <button class="add-btn" data-id="{{ product.id }}">
+                        Add to Basket
+                    </button>
+                    {% endif %}
+
+                </div> 
+
+            </div> 
+        {% endfor %}
+        
+    </div>
+
+    <script>
+        document.querySelectorAll(".add-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const productId = btn.getAttribute("data-id");
+                addToBasket(productId);
+            });
+        });
+    </script>
+
+    <script>
+        function addToBasket(productId) {
+            fetch("/add_to_basket", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ product_id: productId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                fetch("/basket_panel")
+                    .then(res => res.text())
+                    .then(html => {
+                        const panel = document.getElementById("basketPanel");
+                        panel.innerHTML = html;
+                        panel.classList.add("open");
+                    });
+            });
+        }
+    </script> 
+</section>
+
+{% endblock %}

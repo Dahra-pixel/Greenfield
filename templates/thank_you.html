@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="confirmation-page-wrapper">
+    <h1>Thank You for Your Order!</h1>
+    <p>Your order has been successfully placed.</p>
+
+    <h2>Order Summary:</h2>
+    {% for item in items %}
+    <div class="confirmation-item-card">
+        <img src="{{ item.image }}" alt="{{ item.name }}">
+        <div class="confirmation-item-info">
+            <h4>{{ item.name }}</h4>
+            <p class="producer">{{ item.producer }}</p>
+            <div class="basket-price">£{{ item.price }} × {{ item.quantity }}</div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="checkout-total">
+        <h2>Total Paid: £{{ total }}</h2>
+        <p>Payment Method: <strong>{{ payment_method }}</strong></p>
+    </div>
+
+    <a href="/" class="btn-back-home">Back to Home</a>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="checkout-wrapper">
+
+    <h1>Your Order</h1>
+
+    {% for item in items %}
+    <div class="basket-item-card">
+        <div class="basket-top">
+            <img class="basket-thumb" src="{{ item.image }}" alt="{{ item.name }}">
+            <div class="basket-info">
+                <h4>{{ item.name }}</h4>
+                <p class="producer">{{ item.producer }}</p>
+                <div class="basket-price">£{{ item.price }} × {{ item.quantity }}</div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="checkout-total">
+        <h2>Total: £{{ total }}</h2>
+    </div>
+
+    <!-- Payment Method Form -->
+    <form method="POST" action="/confirm_order" class="checkout-payment-form">
+        <h3>Select Payment Method:</h3>
+        <label>
+            <input type="radio" name="payment_method" value="Card"> Card
+        </label>
+        <label>
+            <input type="radio" name="payment_method" value="PayPal"> PayPal
+        </label>
+        <label>
+            <input type="radio" name="payment_method" value="Cash on Delivery"> Cash on Delivery
+        </label>
+
+        <button type="submit" class="btn-confirm-order">Confirm Order</button>
+    </form>
+
+</div>
+
+{% endblock %}

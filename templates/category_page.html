@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="category-header">
+    <h1>Shop by Category</h1>
+    <p class="category-subtext">Find what you need, quick and easy</p>
+</div>
+
+<div class="category-grid">
+
+    <a href="{{ url_for('category_page', category_id=1) }}" class="category-card">
+        <img src="{{ url_for('static', filename='images/freshproduce.jpg') }}">
+        <div class="category-label">Fresh Produce</div>
+    </a>
+    
+    <a href="{{ url_for('category_page', category_id=2) }}" class="category-card">
+        <img src="{{ url_for('static', filename='images/dairy.jpg') }}">
+        <div class="category-label">Dairy & Eggs</div>
+    </a>
+    
+    <a href="{{ url_for('category_page', category_id=3) }}" class="category-card">
+        <img src="{{ url_for('static', filename='images/meat.jpg') }}">
+        <div class="category-label">Meat & Poultry</div>
+    </a>
+    
+    <a href="{{ url_for('category_page', category_id=4) }}" class="category-card">
+        <img src="{{ url_for('static', filename='images/bakery.jpg') }}">
+        <div class="category-label">Bakery</div>
+    </a>
+    
+    <a href="{{ url_for('category_page', category_id=5) }}" class="category-card">
+        <img src="{{ url_for('static', filename='images/beverages.jpg') }}">
+        <div class="category-label">Beverages</div>
+    </a>
+    
+    <a href="{{ url_for('category_page', category_id=6) }}" class="category-card">
+        <img src="{{ url_for('static', filename='images/organic.jpg') }}">
+        <div class="category-label">Organic</div>
+    </a>
+    
+    <a href="{{ url_for('category_page', category_id=7) }}" class="category-card">
+        <img src="{{ url_for('static', filename='images/seasonal.png') }}">
+        <div class="category-label">Seasonal Picks</div>
+    </a>
+
+</div>
+
+{% endblock %}

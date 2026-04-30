@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="orders-wrapper">
+
+    <h1 class="page-title">Your Orders</h1>
+
+    <!-- CURRENT ORDER -->
+    {% if current_order %}
+    <div class="order-card current-order">
+        <div class="order-header">
+            <h2>Current Order</h2>
+            <span class="order-id">#{{ current_order.order_id }}</span>
+        </div>
+        <div class="order-info">
+            <p><strong>Date Ordered:</strong> {{ current_order.order_date }}</p>
+            <p><strong>Total:</strong> £{{ "%.2f"|format(current_order.total_price) }}</p>
+            <p><strong>Items:</strong> 
+                {% for item in current_order.order_items %}
+                    {{ item.name }} x{{ item.qty }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+        <a href="https://www.royalmail.com/track-your-item">
+            <button class="track-btn">Track Parcel</button>
+        </a>
+        
+    </div>
+    {% else %}
+    <p class="no-orders">You have no active orders.</p>
+    {% endif %}
+
+    <!-- ORDER HISTORY -->
+    <h2 class="section-title">Order History</h2>
+
+    {% if history %}
+    <div class="history-wrapper">
+        {% for order in history %}
+        <div class="order-card">
+            <div class="order-header">
+                <h3>Order #{{ order.order_id }}</h3>
+                <span class="order-date">{{ order.order_date }}</span>
+            </div>
+            <div class="order-items">
+                {% for item in order.order_items %}
+                <div class="order-item">
+                    <span>{{ item.name }}</span>
+                    <span>x{{ item.qty }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="order-footer">
+                <p><strong>Total:</strong> £{{ "%.2f"|format(order.total_price) }}</p>
+                <p><strong>Delivered:</strong> {{ order.order_date }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="no-orders">No previous orders found.</p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

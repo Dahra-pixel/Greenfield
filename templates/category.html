@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="category-page">
+
+    <h2 class="page-title">{{ category|capitalize }}</h2>
+
+    <div class="product-grid">
+
+        {% for product in products %}
+            <div class="product-card">
+
+                <img src="{{ url_for('static', filename='images/' + product.name.lower().replace(' ', '-') + '.jpg') }}">
+
+                <div class="product-info">
+                    <h3>{{ product.name }}</h3>
+                    <p class="producer">By {{ product.producer }}</p>
+
+                    <div class="details">
+                        <div class="detail-item">Price: {{ product.price }}</div>
+                        <div class="detail-item">Quantity / Unit: {{ product.weight }}</div>
+                        <div class="detail-item">Available in Stock: {{ product.stock_quantity }}</div>
+                    </div>
+
+                    {% if session.role != 1 %}
+                    <form action="/add_to_basket" method="POST">
+                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                        <button type="submit" class="add-btn">Add to Basket</button>
+                    </form>
+                    {% endif %}
+
+                    
+                </div> 
+
+            </div> 
+        {% endfor %}
+        
+    </div>
+
+</section>
+
+{% endblock %}

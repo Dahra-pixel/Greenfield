@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="manage-page">   
+    <h2 class="section-title">Add a New Product</h2>
+    <div class="form-header">
+        <span>Product Name</span>
+        <span>Price (£)</span>
+        <span>Available in stock</span>
+        <span>Quantity</span>
+        <span>Unit</span>
+        <span>Category</span>
+    </div>
+    <!-- ADD PRODUCT -->
+    <form method="POST" action="/add_product" class="add-form">
+        <input name="name" placeholder="Product Name">
+        <input name="price" placeholder="Price">
+        <input name="stock" placeholder="Stock">
+        <input name="quantity" placeholder="Quantity">
+    
+        <select name="unit">
+                <option value="g">grams (g)</option>
+                <option value="kg">kilograms (kg)</option>
+            
+                <option value="ml">millilitres (ml)</option>
+                <option value="l">litres (l)</option>
+            
+                <option value="pc">piece (pc)</option>
+                <option value="item">item</option>
+                <option value="unit">unit</option>
+            
+                <option value="bottle">bottle</option>
+                <option value="jar">jar</option>
+                <option value="bag">bag</option>
+                <option value="box">box</option>
+                <option value="pack">pack</option>
+            
+                <option value="bunch">bunch</option>
+                <option value="punnet">punnet</option>
+                <option value="tray">tray</option>
+            </select>
+            
+        </td>
+        </select>
+    
+        <select name="category_id">
+            {% for c in categories %}
+                <option value="{{ c[0] }}">{{ c[1] }}</option>
+            {% endfor %}
+        </select>
+    
+        <button type="submit">Add Product</button>
+    </form>
+
+    <!-- PRODUCT TABLE -->
+    <div class="table-container">
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price (£)</th>
+                    <th>Stock</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Category</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <br>
+            <h1>View and update products</h1>
+            <tbody>
+                {% for p in products %}
+                <tr>
+                
+                    <!-- PRODUCT NAME -->
+                    <td>
+                        <input class="edit" type="text" value="{{ p[1] }}" disabled style="display:none;">
+                        <span class="view">{{ p[1] }}</span>
+                        <!-- No editable input -->
+                    </td>
+                    
+                
+                    <!-- PRICE -->
+                    <td>
+                        <span class="view">£{{ p[2] }}</span>
+                        <input class="edit" type="number" step="0.01" value="{{ p[2] }}" style="display:none;">
+                    </td>
+                
+                    <!-- STOCK -->
+                    <td>
+                        <span class="view">{{ p[3] }}</span>
+                        <input class="edit" type="number" value="{{ p[3] }}" style="display:none;">
+                    </td>
+                
+                    <!-- QUANTITY -->
+                    <td>
+                        <span class="view">{{ p[4] }}</span>
+                        <input class="edit" type="number" step="0.01" value="{{ p[4] }}" style="display:none;">
+                    </td>
+                
+                    <!-- UNIT -->
+                    <td>
+                        <span class="view">{{ p[5] }}</span>
+                    
+                        <select class="edit" style="display:none;">
+                            <option value="g" {% if p[5]=='g' %}selected{% endif %}>grams (g)</option>
+                            <option value="kg" {% if p[5]=='kg' %}selected{% endif %}>kilograms (kg)</option>
+                            <option value="ml" {% if p[5]=='ml' %}selected{% endif %}>millilitres (ml)</option>
+                            <option value="l" {% if p[5]=='l' %}selected{% endif %}>litres (l)</option>
+                            <option value="pc" {% if p[5]=='pc' %}selected{% endif %}>piece (pc)</option>
+                            <option value="item" {% if p[5]=='item' %}selected{% endif %}>item</option>
+                            <option value="unit" {% if p[5]=='unit' %}selected{% endif %}>unit</option>
+                            <option value="bottle" {% if p[5]=='bottle' %}selected{% endif %}>bottle</option>
+                            <option value="jar" {% if p[5]=='jar' %}selected{% endif %}>jar</option>
+                            <option value="bag" {% if p[5]=='bag' %}selected{% endif %}>bag</option>
+                            <option value="box" {% if p[5]=='box' %}selected{% endif %}>box</option>
+                            <option value="pack" {% if p[5]=='pack' %}selected{% endif %}>pack</option>
+                            <option value="bunch" {% if p[5]=='bunch' %}selected{% endif %}>bunch</option>
+                            <option value="punnet" {% if p[5]=='punnet' %}selected{% endif %}>punnet</option>
+                            <option value="tray" {% if p[5]=='tray' %}selected{% endif %}>tray</option>
+                        </select>
+                    </td>
+                    
+                    <!-- CATEGORY -->
+                    <td>
+                        <span class="view">{{ p[6] }}</span>
+                        <select class="edit" name="category_id_select" style="display:none;">
+
+                            {% for c in categories %}
+                                <option value="{{ c[0] }}" {% if c[1] == p[6] %}selected{% endif %}>{{ c[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    
+                
+                    <!-- ACTIONS -->
+                    <td>
+                        <button onclick="editRow(this)">Edit</button>
+                
+                        <form class="edit-form" method="POST" action="/update_product" style="display:none;">
+                            <input type="hidden" name="product_id" value="{{ p[0] }}">
+                            <input type="hidden" name="price">
+                            <input type="hidden" name="stock_quantity">
+                            <input type="hidden" name="quantity">
+                            <input type="hidden" name="unit">
+                            <input type="hidden" name="category_id">
+                            <button type="submit">Save</button>
+                        </form>
+                        
+                    </td>
+                
+                    <td>
+                        <a href="/delete_product/{{ p[0] }}">Delete</a>
+                    </td>
+                
+                </tr>
+                {% endfor %}
+                </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    function editRow(btn) {
+        let row = btn.closest("tr");
+    
+        // show inputs
+        row.querySelectorAll(".view").forEach(e => e.style.display = "none");
+        row.querySelectorAll(".edit").forEach(e => e.style.display = "inline-block");
+    
+        // show save button, hide edit button
+        let form = row.querySelector(".edit-form");
+        form.style.display = "inline-block";
+        btn.style.display = "none";
+    
+        form.onsubmit = function() {
+    let inputs = row.querySelectorAll(".edit");
+
+        form.price.value = inputs[1].value;         // price
+        form.stock_quantity.value = inputs[2].value;// stock
+        form.quantity.value = inputs[3].value;      // quantity
+        form.unit.value = inputs[4].value;          // unit
+        form.category_id.value = inputs[5].value;   // category
+    }
+
+    }
+    </script>
+
+{% endblock %}

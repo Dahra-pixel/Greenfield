@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="account-page">
+
+    <div class="account-card">
+        <img src="https://ui-avatars.com/api/?name={{ user.first_name }}" class="profile-img">
+
+        <div class="welcome">
+            Hello, {{ user.first_name }}
+        </div>
+
+        <a href="{{ url_for('manage_products') }}">Manage Products</a>
+        <a href="{{ url_for('producer_orders') }}">Check Customer Orders</a>
+        <a href="/settings">Settings</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+</div>
+
+{% endblock %}

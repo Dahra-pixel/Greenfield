@@ -1,0 +1,105 @@
+<div class="basket-header">
+    <h2>Your Basket</h2>
+    <button id="close-basket">×</button>
+</div>
+
+
+{% if items and items|length > 0 %}
+    {% for item in items %}
+    <div class="basket-item-card">
+
+        <div class="basket-top">
+            <img class="basket-thumb" src="{{ item.image_path }}" alt="{{ item.product_name }}">
+
+            <div class="basket-info">
+                <h4>{{ item.product_name }}</h4>
+                <p class="producer">{{ item.producer_name }}</p>
+                <div class="basket-price">£{{ item.price }}</div>
+            </div>
+        </div>
+
+        <div class="basket-bottom">
+
+            <form class="qty-controls ajax-form" data-action="/update_qty">
+                <input type="hidden" name="product_id" value="{{ item.product_id }}">
+                <button type="submit" name="action" value="minus">-</button>
+                <span class="qty">{{ item.quantity }}</span>
+                <button type="submit" name="action" value="plus">+</button>
+            </form>
+            
+            <form class="ajax-remove" data-action="/remove_item">
+                <input type="hidden" name="product_id" value="{{ item.product_id }}">
+                <button class="delete-btn" type="submit">×</button>
+            </form>
+            
+
+        </div>
+
+    </div>
+    {% endfor %}
+{% else %}
+    <p>Your basket is empty</p>
+{% endif %}
+
+<a href="/checkout" id="checkout-btn" class="checkout-btn">
+    Checkout
+</a>
+<script>
+    document.addEventListener('click', async e => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+    
+        const qtyForm = btn.closest('.qty-controls.ajax-form');
+        const removeForm = btn.closest('.ajax-remove');
+    
+        // PLUS / MINUS
+        if (qtyForm) {
+            e.preventDefault();
+            const action = btn.value; // "plus" or "minus"
+            const product_id = qtyForm.querySelector('input[name="product_id"]').value;
+    
+            const res = await fetch(qtyForm.dataset.action, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ product_id, action })
+            });
+    
+            const data = await res.json();
+            if (!data.success) return;
+    
+            const span = qtyForm.querySelector('.qty');
+            let current = parseInt(span.textContent);
+    
+            if (action === 'plus') current++;
+            if (action === 'minus' && current > 1) current--;
+    
+            span.textContent = current;
+            return;
+        }
+    
+        // DELETE (X)
+        if (removeForm) {
+            e.preventDefault();
+            const product_id = removeForm.querySelector('input[name="product_id"]').value;
+    
+            const res = await fetch(removeForm.dataset.action, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ product_id })
+            });
+    
+            const data = await res.json();
+            if (!data.success) return;
+    
+            removeForm.closest('.basket-item-card').remove();
+        }
+    });
+    </script>
+
+
+    
+    
+    
+
+
+    

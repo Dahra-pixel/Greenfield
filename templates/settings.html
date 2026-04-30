@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="settings-page">
+
+    <div class="settings-card">
+        <h2>Settings</h2>
+
+        <form method="POST" action="/settings">
+
+            <!-- THEME -->
+            <label>Theme</label>
+            <select name="theme">
+                <option value="light" {% if prefs and prefs[0] == 'light' %}selected{% endif %}>Light</option>
+                <option value="dark" {% if prefs and prefs[0] == 'dark' %}selected{% endif %}>Dark</option>
+            </select>
+
+            <!-- TEXT SIZE -->
+            <label>Text Size</label>
+            <input type="range" name="text_size" min="14" max="22" 
+                   value="{{ prefs[1] if prefs else 16 }}"
+                   oninput="document.getElementById('sizeValue').innerText = this.value + 'px'">
+
+            <span id="sizeValue">{{ prefs[1] if prefs else 16 }}px</span>
+
+            <!-- USER INFO -->
+            <h3>Personal Info</h3>
+
+            <input name="first_name" placeholder="First Name" value="{{ user[0] }}">
+            <input name="last_name" placeholder="Last Name" value="{{ user[1] }}">
+            <input name="phone" placeholder="Phone Number" value="{{ user[2] }}">
+            <input name="email" placeholder="Email Address" value="{{ user[3] }}">
+            <input name="address" placeholder="Address" value="{{ user[4] }}">
+            <input name="postcode" placeholder="Postcode" value="{{ user[5] }}">
+
+
+
+            <button type="submit">Save Changes</button>
+
+        </form>
+    </div>
+
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+        <p class="{{ category }}">{{ message }}</p>
+    {% endfor %}
+{% endwith %}
+
+
+{% endblock %}

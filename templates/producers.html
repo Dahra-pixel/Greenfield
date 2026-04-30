@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="title">Producers</h1>
+
+<div class="producer-grid">
+
+    {% for p in producers %}
+        <div class="producer-card" id="producer-{{ p.id }}">
+
+            <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ loop.index }}" class="producer-img">
+
+
+            <div class="producer-info">
+                <p><b>Name:</b> {{ p.name }}</p>
+                <p><b>Joined:</b> {{ p.joined }}</p>
+                <p><b>Location:</b> {{ p.postcode }}</p>
+                <p><b>Rating:</b> ⭐⭐⭐⭐⭐</p>
+            </div>
+
+        </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %} 

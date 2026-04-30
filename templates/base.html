@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+   
+    <nav class="navbar">
+    
+        <!-- LEFT LINKS -->
+        <div class="nav-left">
+            <a href="/products_category">Products</a>
+            <a href="/producers">Producers</a>
+            <a href="/about">About</a>
+            <!-- <p>USER: {{ session.get("user_id") }}</p>
+            <p>ROLE: {{ session.get("role_id") }}</p> -->
+        </div>
+    
+        <!-- CENTER LOGO -->
+        <a href="{{ url_for('home') }}" class="logo-link">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo">
+        </a>
+    
+        <!-- RIGHT SIDE -->
+        <div class="nav-right">
+    
+            <!-- SEARCH -->
+            <div class="search-box">
+                <input type="text" placeholder="Search">
+            </div>
+    
+            {% if session.get("user_id") %}
+
+                {% if session.get("role_id") == 1 %}
+                    <!-- PRODUCER -->
+                    <img src="https://ui-avatars.com/api/?name={{ user.first_name if user else 'User' }}"
+                        class="account-icon"
+                        onclick="window.location.href='/account'">
+
+                {% else %}
+                    <!-- NORMAL USER -->
+                    <a id="basket-icon" class="basket-icon" onclick="toggleBasket()">🛒</a>
+                    <img src="https://ui-avatars.com/api/?name={{ user.first_name if user else 'User' }}" 
+                        class="account-icon"
+                        onclick="toggleMenu()">
+                {% endif %}
+
+            {% else %}
+                <button class="nav-btn" onclick="openLogin(event)">Login</button>
+                <button class="nav-btn signup" onclick="openRegister(event)">Sign Up</button>
+            {% endif %}
+
+        </div>
+    
+    </nav>
+
+{% block content %}{% endblock %}
+
+{% if session.get("user_id") and session.get("role_id") != 1 %}
+<!-- ONLY NORMAL USERS GET PANEL -->
+
+<div class="account-panel" id="accountPanel">
+    <div class="panel-content">
+        <img src="https://ui-avatars.com/api/?name={{ user.first_name }}">
+        <div class="name">Hello, {{ user.first_name }}</div>
+        <div class="points">You’ve got {{ user.points if user else 0 }} points</div>
+
+        <a href="/order_history">📋 View Orders</a>
+        <a href="/settings">⚙ Settings</a>
+        <a href="/logout">🚪 Log out</a>
+    </div>
+
+    <script>
+        function toggleBasket() {
+            const panel = document.getElementById("basketPanel");
+
+            if (panel.classList.contains("open")) {
+                panel.classList.remove("open");
+                return;
+            }
+
+            fetch("/basket_panel")
+                .then(response => response.text())
+                .then(html => {
+                    panel.innerHTML = html;
+                    panel.classList.add("open");
+                });
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const basketIcon = document.getElementById("basket-icon");
+            const basketPanel = document.getElementById("basketPanel");
+
+            if (basketIcon) {
+                basketIcon.addEventListener("click", () => {
+                    toggleBasket();
+                });
+            }
+        });
+    </script>
+
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+{% endif %}
+
+
+<!-- REGISTER MODAL -->
+<div class="modal" id="registerModal">
+    <div class="modal-content">
+        <h2>Create new Account</h2>
+        <p onclick="openLogin(event)">Already Registered? Login</p>
+
+        <form method="POST" action="/register">
+
+            {% with messages = get_flashed_messages(category_filter=["register_error"]) %}
+            {% if messages %}
+                <div class="error-box">
+                    {% for msg in messages %}
+                        <p>{{ msg }}</p>
+                    {% endfor %}
+                </div>
+
+                <script>
+                    window.onload = function() {
+                        openRegister();
+                    }
+                </script>
+            {% endif %}
+            {% endwith %}
+
+            <div class="form-grid">
+                <input name="first_name" placeholder="First Name">
+                <input name="phone" placeholder="Telephone Number">
+
+                <input name="last_name" placeholder="Last Name">
+                <input name="email" placeholder="Email">
+
+                <input name="password" type="password" placeholder="Password">
+                <input name="address" placeholder="Address">
+                <input name="postcode" placeholder="Postcode">
+
+                <label class="full">
+                    <input type="checkbox" name="is_producer" value="1">
+                    Are you a producer?
+                </label>
+            </div>
+
+            <button type="submit">Sign up</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- LOGIN MODAL -->
+<div class="modal" id="loginModal">
+    <div class="modal-content">
+        <h2>Login</h2>
+        <p onclick="openRegister(event)">Create account</p>
+
+        <form method="POST" action="/login" class="login-form">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+
+                {# Open modal when needed #}
+                {% if category == "modal" and message == "open_login_modal" %}
+                    <script>
+                        window.onload = function() {
+                            openLogin();
+                        }
+                    </script>
+                {% endif %}
+
+                {# Show success message #}
+                {% if category == "success" %}
+                    <p style="color: green; font-weight: bold;">{{ message }}</p>
+                {% endif %}
+
+                {# Show login errors #}
+                {% if category == "login_error" %}
+                    <p style="color: red; font-weight: bold;">{{ message }}</p>
+                {% endif %}
+
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+
+
+
+        <input name="email" placeholder="Email">
+        <input name="password" type="password" placeholder="Password">
+
+        <p style="font-size:12px; text-align:right;">Forgot password?</p>
+
+        <button type="submit">Login</button>
+        </form>
+    </div>
+</div>
+
+<!-- BASKET PANEL WRAPPER -->
+<div id="basketPanel" class="basket-panel">
+    {% include "basket_panel.html" %}
+</div>
+
+
+<script>
+    function toggleBasket() {
+        const panel = document.getElementById("basketPanel");
+
+        // If already open → close it
+        if (panel.classList.contains("open")) {
+            panel.classList.remove("open");
+            return;
+        }
+
+        // Load basket panel dynamically
+        fetch("/basket_panel")
+            .then(response => response.text())
+            .then(html => {
+                panel.innerHTML = html;
+                panel.classList.add("open");
+
+                // Attach close button event AFTER content loads
+                const closeBtn = panel.querySelector("#close-basket");
+                if (closeBtn) {
+                    closeBtn.addEventListener("click", () => {
+                        panel.classList.remove("open");
+                    });
+                }
+            });
+    }
+</script>
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const basketIcon = document.getElementById("basket-icon");
+        const basketPanel = document.getElementById("basketPanel");
+        const closeBtn = document.getElementById("close-basket");
+    
+        if (basketIcon) {
+            basketIcon.addEventListener("click", () => {
+                basketPanel.classList.add("open");
+            });
+        }
+    
+        if (closeBtn) {
+            closeBtn.addEventListener("click", () => {
+                basketPanel.classList.remove("open");
+            });
+        }
+    });
+</script>
+
+
+<script>
+    const accountIcon = document.querySelector(".account-icon");
+    const accountPanel = document.getElementById("accountPanel");
+    
+    if (accountIcon) {
+        accountIcon.addEventListener("click", () => {
+            accountPanel.classList.toggle("show");
+        });
+    }
+    
+    // Close account panel when clicking outside
+    document.addEventListener("click", e => {
+        if (accountPanel && accountPanel.classList.contains("show")) {
+            if (!accountPanel.contains(e.target) && !accountIcon.contains(e.target)) {
+                accountPanel.classList.remove("show");
+            }
+        }
+    });
+    
+    
+    // ----------------------
+    // MODAL OPEN FUNCTIONS
+    // ----------------------
+    function openLogin(e) {
+        if (e) e.stopPropagation();
+        document.getElementById("loginModal").classList.add("active");
+        document.getElementById("registerModal").classList.remove("active");
+    }
+    
+    function openRegister(e) {
+        if (e) e.stopPropagation();
+        document.getElementById("registerModal").classList.add("active");
+        document.getElementById("loginModal").classList.remove("active");
+    }
+    
+    
+    // ----------------------
+    // CLICK OUTSIDE TO CLOSE
+    // ----------------------
+    document.addEventListener("click", function (event) {
+        const loginModal = document.getElementById("loginModal");
+        const registerModal = document.getElementById("registerModal");
+    
+        // Close login modal if clicking backdrop
+        if (loginModal.classList.contains("active") &&
+            event.target === loginModal) {
+            loginModal.classList.remove("active");
+        }
+    
+        // Close register modal if clicking backdrop
+        if (registerModal.classList.contains("active") &&
+            event.target === registerModal) {
+            registerModal.classList.remove("active");
+        }
+    });
+    </script>
+
+
+<footer class="footer">
+    <div class="footer-container">
+
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <a href="/products_category">Products</a>
+            <a href="#">Producers</a>
+            <a href="/about">About Us</a>
+        </div>
+
+        <div class="footer-section">
+            <h4>Help</h4>
+            <a href="#">FAQs</a>
+            <a href="#">Returns</a>
+            <a href="#">Contact Us</a>
+        </div>
+
+        <div class="footer-section">
+            <h4>Follow Us</h4>
+            <a href="#">Instagram</a>
+            <a href="#">Twitter</a>
+            <a href="#">Facebook</a>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+        <p>© 2026 Greenfield. All rights reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>
